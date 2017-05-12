@@ -1,6 +1,7 @@
 use std::io;
 use std::io::BufRead;
 use std::collections::HashSet;
+use std::iter;
 
 fn build_graph(wordlist: &Vec<String>) -> Vec<Vec<usize>> {
     let words_count = wordlist.len();
@@ -27,6 +28,43 @@ fn build_graph(wordlist: &Vec<String>) -> Vec<Vec<usize>> {
     graph
 }
 
+fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
+    let node_count = graph.len();
+    let mut toppath: Vec<usize> = Vec::with_capacity(node_count);
+    let mut stack: Vec<usize> = Vec::with_capacity(node_count);
+    let mut visited: Vec<bool> = iter::repeat(false)
+        .take(node_count)
+        .collect();
+
+    fn traverse_graph(
+        graph: &Vec<Vec<usize>>,
+        pos: usize,
+        visited: &mut Vec<bool>,
+        toppath: &mut Vec<usize>,
+        stack: &mut Vec<usize>
+    ) {
+        visited[pos] = true;
+        stack.push(pos);
+        if toppath.len() < stack.len() {
+            toppath.clear();
+            toppath.extend(stack.iter());
+        }
+        for link in &graph[pos] {
+            if !visited[*link] {
+                traverse_graph(graph, *link, visited, toppath, stack);
+            }
+        }
+        visited[pos] = false;
+        stack.pop();
+    };
+
+    for i in 0..node_count {
+        traverse_graph(graph, i, &mut visited, &mut toppath, &mut stack);
+    }
+
+    toppath
+}
+
 fn main() {
     let stdin = io::stdin();
     let mut words: HashSet<String> = stdin.lock()
@@ -42,11 +80,15 @@ fn main() {
         .collect();
     wordlist.sort();
 
-    for (i, links) in build_graph(&wordlist).iter().enumerate() {
-        print!("{} ->", wordlist[i]);
-        for j in links {
-            print!("{},", wordlist[*j]);
-        }
-        println!();
+    let graph = build_graph(&wordlist);
+    //for (i, links) in graph.iter().enumerate() {
+    //    print!("{} ->", wordlist[i]);
+    //    for j in links {
+    //        print!("{},", wordlist[*j]);
+    //    }
+    //    println!();
+    //}
+    for word in longest_path(&graph).iter().map(|idx| &wordlist[*idx]) {
+        println!("{}", word);
     }
 }
