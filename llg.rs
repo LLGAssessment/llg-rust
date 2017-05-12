@@ -22,7 +22,7 @@ fn build_graph(wordlist: &Vec<String>) -> Vec<Vec<usize>> {
                 links.push(j);
             }
         }
-        graph[i] = links;
+        graph.push(links);
     }
     graph
 }
@@ -42,8 +42,11 @@ fn main() {
         .collect();
     wordlist.sort();
 
-    for word in &wordlist {
-        println!("{}", word);
+    for (i, links) in build_graph(&wordlist).iter().enumerate() {
+        print!("{} ->", wordlist[i]);
+        for j in links {
+            print!("{},", wordlist[*j]);
+        }
+        println!();
     }
-    build_graph(wordlist);
 }
