@@ -75,19 +75,11 @@ fn main() {
         .collect();
     words.remove("");
 
-    let mut wordlist: Vec<String> = words
+    let wordlist: Vec<String> = words
         .drain()
         .collect();
-    wordlist.sort();
 
     let graph = build_graph(&wordlist);
-    //for (i, links) in graph.iter().enumerate() {
-    //    print!("{} ->", wordlist[i]);
-    //    for j in links {
-    //        print!("{},", wordlist[*j]);
-    //    }
-    //    println!();
-    //}
     for word in longest_path(&graph).iter().map(|idx| &wordlist[*idx]) {
         println!("{}", word);
     }
