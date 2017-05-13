@@ -36,30 +36,34 @@ fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
         .take(node_count)
         .collect();
 
-    fn traverse_graph(
-        graph: &Vec<Vec<usize>>,
-        pos: usize,
-        visited: &mut Vec<bool>,
-        toppath: &mut Vec<usize>,
-        stack: &mut Vec<usize>
-    ) {
-        visited[pos] = true;
-        stack.push(pos);
-        if toppath.len() < stack.len() {
-            toppath.clear();
-            toppath.extend(stack.iter());
+    {
+    struct Env<'a> {
+        graph: &'a Vec<Vec<usize>>,
+        visited: &'a mut Vec<bool>,
+        toppath: &'a mut Vec<usize>,
+        stack: &'a mut Vec<usize>
+    }
+    let mut env = Env { graph: graph, visited: &mut visited, toppath: &mut toppath, stack: &mut stack };
+
+    fn traverse_graph(env: &mut Env, pos: usize) {
+        env.visited[pos] = true;
+        env.stack.push(pos);
+        if env.toppath.len() < env.stack.len() {
+            env.toppath.clear();
+            env.toppath.extend(env.stack.iter());
         }
-        for link in &graph[pos] {
-            if !visited[*link] {
-                traverse_graph(graph, *link, visited, toppath, stack);
+        for link in &env.graph[pos] {
+            if !env.visited[*link] {
+                traverse_graph(env, pos);
             }
         }
-        visited[pos] = false;
-        stack.pop();
+        env.visited[pos] = false;
+        env.stack.pop();
     };
 
     for i in 0..node_count {
-        traverse_graph(graph, i, &mut visited, &mut toppath, &mut stack);
+        traverse_graph(&mut env, i);
+    }
     }
 
     toppath
