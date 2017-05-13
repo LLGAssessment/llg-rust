@@ -1,7 +1,9 @@
 use std::io;
 use std::io::BufRead;
+use std::io::BufReader;
 use std::collections::HashSet;
 use std::iter;
+use std::fs::File;
 
 fn build_graph(wordlist: &Vec<String>) -> Vec<Vec<usize>> {
     let words_count = wordlist.len();
@@ -66,8 +68,8 @@ fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
 }
 
 fn main() {
-    let stdin = io::stdin();
-    let mut words: HashSet<String> = stdin.lock()
+    let stdin = File::open("llg-dataset/70pokemons.txt").unwrap();
+    let mut words: HashSet<String> = BufReader::new(&stdin)
         .lines()
         .map(
             |word| String::from(word.unwrap().trim())
