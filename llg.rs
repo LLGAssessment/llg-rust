@@ -36,13 +36,9 @@ fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
         .take(node_count)
         .collect();
 
-    fn traverse_graph(
-        graph: &Vec<Vec<usize>>,
-        pos: usize,
-        visited: &mut Vec<bool>,
-        toppath: &mut Vec<usize>,
-        stack: &mut Vec<usize>
-    ) {
+    let mut traverse_graph = unsafe{ std::mem::uninitialized() };
+    let y = {&mut traverse_graph as *mut FnMut(usize)};
+    traverse_graph = |pos: usize| {
         visited[pos] = true;
         stack.push(pos);
         if toppath.len() < stack.len() {
@@ -51,7 +47,7 @@ fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
         }
         for link in &graph[pos] {
             if !visited[*link] {
-                traverse_graph(graph, *link, visited, toppath, stack);
+                unsafe{ (*y)(*link) }
             }
         }
         visited[pos] = false;
@@ -59,7 +55,7 @@ fn longest_path(graph: &Vec<Vec<usize>>) -> Vec<usize> {
     };
 
     for i in 0..node_count {
-        traverse_graph(graph, i, &mut visited, &mut toppath, &mut stack);
+        traverse_graph(i);
     }
 
     toppath
