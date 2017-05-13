@@ -1,0 +1,5 @@
+[package]
+
+name = "llg"
+version = "0.0.1"
+authors = [ "Vladislav Yarmak <vladislav@vm-0.com>" ]
